@@ -136,11 +136,14 @@ class CAENFastPS(Device):
     @command
     def enable(self):
         self.write_read('MON')
+        self.set_state(DevState.RUNNING)
+        self.__enabled = True
 
     @command
     def disable(self):
         self.write_read('MOFF')
         self.set_state(DevState.ON)
+        self.__enabled = False
 
     @command
     def current_mode(self):
