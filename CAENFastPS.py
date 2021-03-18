@@ -14,7 +14,7 @@ class LoopMode(IntEnum):
 
 class UpdateMode(IntEnum):
     Normal = 0
-    Analog = 3
+    Analog = 1
 
 
 class CAENFastPS(Device):
@@ -104,7 +104,9 @@ class CAENFastPS(Device):
 
         self.__loop_mode = int(bin_status[-6])
 
-        self.__update_mode = int(bin_status[-8:-6])
+        # actually bits 7-8, but possible values are [00, 11], so check only one bit
+        # useful since only consecutive enums allowed
+        self.__update_mode = int(bin_status[-8])
 
     def read_current(self):
         return float(self.write_read('MRI'))
@@ -136,24 +138,19 @@ class CAENFastPS(Device):
     @command
     def enable(self):
         self.write_read('MON')
-        self.set_state(DevState.RUNNING)
-        self.__enabled = True
 
     @command
     def disable(self):
         self.write_read('MOFF')
-        self.set_state(DevState.ON)
-        self.__enabled = False
 
     @command
     def current_mode(self):
         self.write_read('LOOP:I')
 
-    @command(dtype_in=UpdateMode, doc_in='0: normal, 3: analog')
+    @command(dtype_in=int, doc_in='0: normal, 1: analog')
     def set_update_mode(self, mode):
-        ans = self.write_read(f'UPMODE:{mode.name.upper()}')
-        if ans == 0:
-            self.__update_mode = mode
+        modename = UpdateMode(mode).name.upper()
+        self.write_read(f'UPMODE:{modename}')
 
     @command(dtype_in=str, doc_in='command', dtype_out=str, doc_out='response')
     def write_read(self, cmd):
