@@ -104,8 +104,6 @@ class CAENFastPS(Device):
 
         self.__loop_mode = int(bin_status[-6])
 
-        # actually bits 7-8, but possible values are [00, 11], so check only one bit
-        # useful since only consecutive enums allowed
         self.__update_mode = int(bin_status[-8])
 
     def read_current(self):
@@ -147,10 +145,13 @@ class CAENFastPS(Device):
     def current_mode(self):
         self.write_read('LOOP:I')
 
-    @command(dtype_in=int, doc_in='0: normal, 1: analog')
-    def set_update_mode(self, mode):
-        modename = UpdateMode(mode).name.upper()
-        self.write_read(f'UPMODE:{modename}')
+    @command
+    def analog_mode(self):
+        self.write_read(f'UPMODE:ANALOG')
+
+    @command
+    def normal_mode(self):
+        self.write_read(f'UPMODE:NORMAL')
 
     @command(dtype_in=str, doc_in='command', dtype_out=str, doc_out='response')
     def write_read(self, cmd):
