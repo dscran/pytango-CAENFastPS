@@ -54,7 +54,8 @@ class CAENFastPS(Device):
         label='update mode',
         dtype=UpdateMode,
         access=AttrWriteType.READ,
-        doc='direct set point control (normal) or analog input (+/-10V, requires hardware option)',)
+        doc=('direct set point control (normal) or analog input'
+             '(+/-10V, requires optional hardware)'),)
 
     enabled = attribute(
         label='enabled',
